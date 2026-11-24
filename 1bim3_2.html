@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Evaluación de Inglés (Modelo B) - 1° Año - 3° Bimestre</title>
+    <title>Evaluación de Inglés - 1° Año - 3° Bimestre</title>
     <style>
         :root { --primary: #581c87; --secondary: #9333ea; --danger: #dc2626; --bg: #f1f5f9; }
         * { box-sizing: border-box; }
@@ -31,7 +31,7 @@
 <div id="start-screen">
     <div class="card-start">
         <h1>Evaluación de Inglés - 1° Año</h1>
-        <p><strong>3° Bimestre (Modelo B)</strong> | Tiempo límite: 30 minutos</p>
+        <p><strong>3° Bimestre</strong> | Tiempo límite: 30 minutos</p>
         <p style="font-size: 14px; color: #94a3b8;">Al iniciar, el examen pasará a pantalla completa. Salir de la pantalla o cambiar de ventana quedará registrado en el informe final.</p>
         <input type="text" id="st-name" placeholder="Nombre y Apellido del Alumno/a">
         <input type="text" id="st-course" placeholder="Curso y División (ej: 1° 1°)">
@@ -49,8 +49,8 @@
     <div class="card-start">
         <h1>✅ Evaluación Finalizada</h1>
         <p>Tus respuestas, el puntaje automático y las correcciones se han descargado en un archivo de texto.</p>
-        <p>Por favor, entrega ese archivo a tu profesor/a.</p>
-        <button type="button" id="btn-redownload">Descargar archivo nuevamente</button>
+        <p>Por favor, entrega ese archivo a tu profesor.</p>
+        <button type="button" id="btn-redownload">Descargar archivo nuevamente.</button>
     </div>
 </div>
 
@@ -312,7 +312,7 @@
         bodyText += "d) " + checkItem("q6_d", ["We want to swim in the sea.", "We want to swim in the sea"], "We want to swim in the sea.", 0.50) + "\n";
 
         var header = "====================================================================\n";
-        header += "EVALUACIÓN DE INGLÉS - 1° AÑO - 3° BIMESTRE (MODELO B - CABA)\n";
+        header += "EVALUACIÓN DE INGLÉS - 1° AÑO - 3° BIMESTRE\n";
         header += "====================================================================\n";
         header += "Alumno/a: " + studentName + "\n";
         header += "Curso: " + studentCourse + "\n";
@@ -369,7 +369,7 @@
         });
         document.addEventListener("visibilitychange", function() {
             if (examStarted && !examFinished && document.hidden) {
-                logSecurity("Cambió de pestaña o minimizó el navegador");
+                logSecurity("Cambió de pestaña o minimizó el navegador.");
                 document.getElementById("warning-modal").style.display = "flex";
             }
         });
