@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Evaluación de Inglés (Modelo B) - 1° Año - 3° Bimestre</title>
+    <style>
+        :root { --primary: #581c87; --secondary: #9333ea; --danger: #dc2626; --bg: #f1f5f9; }
+        * { box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); color: #1e293b; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; }
+        input, select, textarea { user-select: text !important; -webkit-user-select: text !important; }
+        #start-screen, #end-screen { position: fixed; inset: 0; background: #0f172a; color: white; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; padding: 20px; text-align: center; }
+        .card-start { background: #1e293b; padding: 30px; border-radius: 12px; max-width: 500px; width: 100%; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+        .card-start input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 6px; border: 1px solid #475569; background: #0f172a; color: white; font-size: 16px; }
+        button { background: var(--secondary); color: white; border: none; padding: 12px 24px; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        button:hover { background: #7e22ce; }
+        header { position: sticky; top: 0; background: var(--primary); color: white; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.2); }
+        #timer { font-size: 22px; font-weight: bold; background: #0f172a; padding: 6px 15px; border-radius: 6px; color: #d8b4fe; }
+        #alert-badge { background: var(--danger); padding: 6px 12px; border-radius: 6px; font-weight: bold; font-size: 14px; }
+        .container { max-width: 900px; margin: 30px auto; background: white; padding: 35px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        .reading-box { background: #faf5ff; border-left: 5px solid var(--secondary); padding: 20px; border-radius: 6px; line-height: 1.7; font-size: 16px; margin-bottom: 30px; }
+        h2 { color: var(--primary); border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; margin-top: 35px; }
+        .question { margin-bottom: 20px; padding: 15px; background: #f8fafc; border-radius: 8px; border: 1px solid #e2e8f0; }
+        input[type="text"], select { padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 5px; font-size: 15px; margin: 4px 0; }
+        input[type="text"].long { width: 100%; margin-top: 8px; }
+        .warning-modal { display: none; position: fixed; inset: 0; background: rgba(220, 38, 38, 0.95); color: white; z-index: 10000; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px; }
+    </style>
+</head>
+<body>
+
+<div id="start-screen">
+    <div class="card-start">
+        <h1>Evaluación de Inglés - 1° Año</h1>
+        <p><strong>3° Bimestre (Modelo B)</strong> | Tiempo límite: 30 minutos</p>
+        <p style="font-size: 14px; color: #94a3b8;">Al iniciar, el examen pasará a pantalla completa. Salir de la pantalla o cambiar de ventana quedará registrado en el informe final.</p>
+        <input type="text" id="st-name" placeholder="Nombre y Apellido del Alumno/a">
+        <input type="text" id="st-course" placeholder="Curso y División (ej: 1° 1°)">
+        <button type="button" id="btn-start">Comenzar Evaluación</button>
+    </div>
+</div>
+
+<div id="warning-modal" class="warning-modal">
+    <h1>⚠️ ¡ADVERTENCIA DE SEGURIDAD!</h1>
+    <p style="font-size: 20px;">Has salido de la pantalla completa o cambiado de ventana.<br>Este evento ha sido registrado para tu docente.</p>
+    <button type="button" style="background: white; color: #dc2626;" id="btn-return">Volver al Examen</button>
+</div>
+
+<div id="end-screen" style="display: none;">
+    <div class="card-start">
+        <h1>✅ Evaluación Finalizada</h1>
+        <p>Tus respuestas, el puntaje automático y las correcciones se han descargado en un archivo de texto.</p>
+        <p>Por favor, entrega ese archivo a tu profesor/a.</p>
+        <button type="button" id="btn-redownload">Descargar archivo nuevamente</button>
+    </div>
+</div>
+
+<header>
+    <div>
+        <strong>ENGLISH TEST - 3rd TERM (1° AÑO)</strong> | <span id="display-student"></span>
+    </div>
+    <div style="display: flex; gap: 15px; align-items: center;">
+        <div id="alert-badge">Alertas: 0</div>
+        <div id="timer">30:00</div>
+    </div>
+</header>
+
+<div class="container" id="exam-content">
+    <h2>1. Reading Comprehension</h2>
+    <p>Read the text carefully and do the activities below.</p>
+    <div class="reading-box">
+        <p>My name is Joaquín, I am fourteen years old and I live in Nuñez, Buenos Aires. My birthday is in August. I live with my family: my parents, my younger sister Emilia, and our parrot, Coco. My father's name is Martín and he is a firefighter at a local station. He works shifts and always helps people in emergencies. My mother's name is Paula; she is a dentist and works in a clinic in Vicente López. Her patients really like her!</p>
+        <p>Emilia is ten years old and she goes to primary school. She loves technology because she wants to build robots in the future. She doesn't have homework on Fridays, so on Friday evenings she watches science videos on her tablet. In her free time, Emilia draws comic strips and rides her bicycle in our uncle's garden.</p>
+        <p>I am in the first year of secondary school and I love geography and travelling. When I finish school, I want to be a pilot because I want to fly around the world. Next month is January, and my family wants a long summer trip to Mar del Plata. We want to swim in the sea and rest on the beach.</p>
+    </div>
+
+    <h2>2. True or False? Justify your answers (with information from the text)</h2>
+    <div class="question">
+        <p><strong>a)</strong> Joaquín's birthday is in the eighth month of the year. 
+            <select id="q2_a_tf"><option value="">-- Select --</option><option value="TRUE">TRUE</option><option value="FALSE">FALSE</option></select>
+        </p>
+        <input type="text" class="long" id="q2_a_just" placeholder="Justification...">
+    </div>
+    <div class="question">
+        <p><strong>b)</strong> Paula works as a firefighter in Nuñez. 
+            <select id="q2_b_tf"><option value="">-- Select --</option><option value="TRUE">TRUE</option><option value="FALSE">FALSE</option></select>
+        </p>
+        <input type="text" class="long" id="q2_b_just" placeholder="Justification...">
+    </div>
+    <div class="question">
+        <p><strong>c)</strong> Emilia has a lot of homework on Friday evenings. 
+            <select id="q2_c_tf"><option value="">-- Select --</option><option value="TRUE">TRUE</option><option value="FALSE">FALSE</option></select>
+        </p>
+        <input type="text" class="long" id="q2_c_just" placeholder="Justification...">
+    </div>
+    <div class="question">
+        <p><strong>d)</strong> Joaquín wants to travel around the world in the future. 
+            <select id="q2_d_tf"><option value="">-- Select --</option><option value="TRUE">TRUE</option><option value="FALSE">FALSE</option></select>
+        </p>
+        <input type="text" class="long" id="q2_d_just" placeholder="Justification...">
+    </div>
+
+    <h2>3. Vocabulary: Match the definitions (1-5) with the correct words (A-E)</h2>
+    <div class="question">
+        <p><strong>1. A person who puts out fires and rescues people</strong>: 
+            <select id="q3_1"><option value="">-- Choose --</option><option value="A">A. Dentist</option><option value="B">B. Pilot</option><option value="C">C. Firefighter</option><option value="D">D. January</option><option value="E">E. Uncle</option></select>
+        </p>
+        <p><strong>2. A doctor who takes care of people's teeth</strong>: 
+            <select id="q3_2"><option value="">-- Choose --</option><option value="A">A. Dentist</option><option value="B">B. Pilot</option><option value="C">C. Firefighter</option><option value="D">D. January</option><option value="E">E. Uncle</option></select>
+        </p>
+        <p><strong>3. A person who flies an aeroplane</strong>: 
+            <select id="q3_3"><option value="">-- Choose --</option><option value="A">A. Dentist</option><option value="B">B. Pilot</option><option value="C">C. Firefighter</option><option value="D">D. January</option><option value="E">E. Uncle</option></select>
+        </p>
+        <p><strong>4. The brother of your mother or father</strong>: 
+            <select id="q3_4"><option value="">-- Choose --</option><option value="A">A. Dentist</option><option value="B">B. Pilot</option><option value="C">C. Firefighter</option><option value="D">D. January</option><option value="E">E. Uncle</option></select>
+        </p>
+        <p><strong>5. The first month of the year</strong>: 
+            <select id="q3_5"><option value="">-- Choose --</option><option value="A">A. Dentist</option><option value="B">B. Pilot</option><option value="C">C. Firefighter</option><option value="D">D. January</option><option value="E">E. Uncle</option></select>
+        </p>
+    </div>
+
+    <h2>4. Grammar: Possessives, Present Simple (3rd person) & WANT</h2>
+    <p>Fill in the gaps with the correct word or verb form.</p>
+    <div class="question" style="line-height: 2.3;">
+        1. Paula is Joaquín's mother. <input type="text" id="q4_1" size="10"> (His / Her / Their) clinic is in Vicente López.<br>
+        2. Emilia <input type="text" id="q4_2" size="12"> (watch) science videos, but she <input type="text" id="q4_2b" size="14"> (not / have) homework on Fridays.<br>
+        3. That is <input type="text" id="q4_3" size="14"> (Emilia / tablet). She uses it every evening.<br>
+        4. My family <input type="text" id="q4_4" size="12"> (want) a summer trip to Mar del Plata.<br>
+        5. Joaquín <input type="text" id="q4_5" size="18"> (want / fly) around the world.
+    </div>
+
+    <h2>5. Multiple Choice: Choose the correct option and justify your choice</h2>
+    <div class="question">
+        <p><strong>a)</strong> "She rides her bicycle in our ________ garden."</p>
+        <select id="q5_a_mc">
+            <option value="">-- Select option --</option>
+            <option value="A">A. uncles</option>
+            <option value="B">B. uncle's</option>
+            <option value="C">C. uncle</option>
+        </select>
+        <input type="text" class="long" id="q5_a_just" placeholder="Justify your answer (explain the possessive rule)...">
+    </div>
+    <div class="question">
+        <p><strong>b)</strong> Which sentence uses <strong>WANT</strong> correctly?</p>
+        <select id="q5_b_mc">
+            <option value="">-- Select option --</option>
+            <option value="A">A. Emilia wants build robots in the future.</option>
+            <option value="B">B. Emilia want to build robots in the future.</option>
+            <option value="C">C. Emilia wants to build robots in the future.</option>
+        </select>
+        <input type="text" class="long" id="q5_b_just" placeholder="Justify your answer (explain why the other options are incorrect)...">
+    </div>
+
+    <h2>6. Put the words in order to make correct sentences or questions</h2>
+    <div class="question">
+        <p><strong>a)</strong> name / Martín / father's / My / is / .</p>
+        <input type="text" class="long" id="q6_a" placeholder="Write the sentence here...">
+    </div>
+    <div class="question">
+        <p><strong>b)</strong> in / birthday / Is / August / your / ?</p>
+        <input type="text" class="long" id="q6_b" placeholder="Write the question here...">
+    </div>
+    <div class="question">
+        <p><strong>c)</strong> wants / new / a / tablet / She / .</p>
+        <input type="text" class="long" id="q6_c" placeholder="Write the sentence here...">
+    </div>
+    <div class="question">
+        <p><strong>d)</strong> to / sea / want / We / swim / the / in / .</p>
+        <input type="text" class="long" id="q6_d" placeholder="Write the sentence here...">
+    </div>
+
+    <div style="text-align: center; margin-top: 40px;">
+        <button type="button" id="btn-finish" style="background: #581c87; font-size: 18px; padding: 15px 40px;">Entregar Evaluación</button>
+    </div>
+</div>
+
+<script>
+    var studentName = "";
+    var studentCourse = "";
+    var totalSeconds = 30 * 60;
+    var timeLeft = totalSeconds;
+    var timerInterval = null;
+    var securityLogs = [];
+    var examStarted = false;
+    var examFinished = false;
+    var autoScore = 0;
+
+    function logSecurity(reason) {
+        var now = new Date().toLocaleTimeString();
+        securityLogs.push("[" + now + "] " + reason);
+        document.getElementById("alert-badge").innerText = "Alertas: " + securityLogs.length;
+    }
+
+    function enterFullscreenSafe() {
+        var el = document.documentElement;
+        if (el.requestFullscreen) el.requestFullscreen().catch(function(){});
+        else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+        else if (el.msRequestFullscreen) el.msRequestFullscreen();
+    }
+
+    function startExam() {
+        studentName = document.getElementById("st-name").value.trim();
+        studentCourse = document.getElementById("st-course").value.trim();
+        if (!studentName || !studentCourse) {
+            alert("Por favor, completá tu Nombre, Apellido y Curso antes de comenzar.");
+            return;
+        }
+        document.getElementById("display-student").innerText = studentName + " (" + studentCourse + ")";
+        document.getElementById("start-screen").style.display = "none";
+        examStarted = true;
+        enterFullscreenSafe();
+
+        timerInterval = setInterval(function() {
+            timeLeft--;
+            var m = Math.floor(timeLeft / 60).toString().padStart(2, "0");
+            var s = (timeLeft % 60).toString().padStart(2, "0");
+            document.getElementById("timer").innerText = m + ":" + s;
+            if (timeLeft <= 0) finishExam();
+        }, 1000);
+    }
+
+    function returnFullscreen() {
+        enterFullscreenSafe();
+        document.getElementById("warning-modal").style.display = "none";
+    }
+
+    function finishExam() {
+        if (examFinished) return;
+        examFinished = true;
+        clearInterval(timerInterval);
+        if (document.fullscreenElement && document.exitFullscreen) document.exitFullscreen().catch(function(){});
+        document.getElementById("warning-modal").style.display = "none";
+        document.getElementById("end-screen").style.display = "flex";
+        downloadResults();
+    }
+
+    function normalize(str) {
+        return str.toLowerCase().trim().replace(/\s+/g, " ").replace(/’/g, "'");
+    }
+
+    function checkItem(id, correctAnswers, displayCorrect, points) {
+        var el = document.getElementById(id);
+        var raw = el ? el.value.trim() : "";
+        if (!raw) {
+            return "⚪ NOT ANSWERED (0/" + points.toFixed(2) + " pts) | Student: (blank) | Correct answer: " + displayCorrect;
+        }
+        var normUser = normalize(raw);
+        var isOk = false;
+        for (var i = 0; i < correctAnswers.length; i++) {
+            if (normUser === normalize(correctAnswers[i])) {
+                isOk = true;
+                break;
+            }
+        }
+        if (isOk) {
+            autoScore += points;
+            return "✅ CORRECT (+" + points.toFixed(2) + " pts) | Student: " + raw + " | Correct answer: " + displayCorrect;
+        } else {
+            return "❌ INCORRECT (0/" + points.toFixed(2) + " pts) | Student: " + raw + " | Correct answer: " + displayCorrect;
+        }
+    }
+
+    function checkJustification(id, modelJust, maxPts) {
+        var el = document.getElementById(id);
+        var raw = el ? el.value.trim() : "";
+        if (!raw) {
+            return "   ⚪ Justification: NOT ANSWERED (0/" + maxPts.toFixed(2) + " pts) | Model answer: " + modelJust;
+        }
+        return "   📝 Justification [TEACHER REVIEW - Max: " + maxPts.toFixed(2) + " pts]: \"" + raw + "\"\n      -> Model answer: " + modelJust;
+    }
+
+    function downloadResults() {
+        autoScore = 0;
+        var elapsed = totalSeconds - timeLeft;
+        var timeUsed = Math.floor(elapsed / 60) + " min " + (elapsed % 60) + " seg";
+
+        var bodyText = "";
+        bodyText += "--- SECTION 2: TRUE OR FALSE (1.00 pt Auto) + JUSTIFICATION (2.00 pts Teacher) ---\n";
+        bodyText += "a) " + checkItem("q2_a_tf", ["TRUE"], "TRUE", 0.25) + "\n";
+        bodyText += checkJustification("q2_a_just", "His birthday is in August (the 8th month).", 0.50) + "\n";
+        bodyText += "b) " + checkItem("q2_b_tf", ["FALSE"], "FALSE", 0.25) + "\n";
+        bodyText += checkJustification("q2_b_just", "Paula is a dentist in Vicente López (Martín is a firefighter).", 0.50) + "\n";
+        bodyText += "c) " + checkItem("q2_c_tf", ["FALSE"], "FALSE", 0.25) + "\n";
+        bodyText += checkJustification("q2_c_just", "She doesn't have homework on Fridays.", 0.50) + "\n";
+        bodyText += "d) " + checkItem("q2_d_tf", ["TRUE"], "TRUE", 0.25) + "\n";
+        bodyText += checkJustification("q2_d_just", "He wants to be a pilot because he wants to fly around the world.", 0.50) + "\n\n";
+
+        bodyText += "--- SECTION 3: VOCABULARY MATCHING (1.00 pt Auto - 0.20 each) ---\n";
+        bodyText += "1. Firefighter: " + checkItem("q3_1", ["C"], "C", 0.20) + "\n";
+        bodyText += "2. Dentist: " + checkItem("q3_2", ["A"], "A", 0.20) + "\n";
+        bodyText += "3. Pilot: " + checkItem("q3_3", ["B"], "B", 0.20) + "\n";
+        bodyText += "4. Uncle: " + checkItem("q3_4", ["E"], "E", 0.20) + "\n";
+        bodyText += "5. January: " + checkItem("q3_5", ["D"], "D", 0.20) + "\n\n";
+
+        bodyText += "--- SECTION 4: GRAMMAR FILL IN THE GAPS (2.50 pts Auto) ---\n";
+        bodyText += "1. " + checkItem("q4_1", ["her"], "Her", 0.40) + "\n";
+        bodyText += "2 (verb 1). " + checkItem("q4_2", ["watches"], "watches", 0.35) + "\n";
+        bodyText += "2 (verb 2). " + checkItem("q4_2b", ["doesn't have", "does not have"], "doesn't have", 0.35) + "\n";
+        bodyText += "3. " + checkItem("q4_3", ["emilia's tablet"], "Emilia's tablet", 0.50) + "\n";
+        bodyText += "4. " + checkItem("q4_4", ["wants"], "wants", 0.40) + "\n";
+        bodyText += "5. " + checkItem("q4_5", ["wants to fly"], "wants to fly", 0.50) + "\n\n";
+
+        bodyText += "--- SECTION 5: MULTIPLE CHOICE (0.50 pt Auto) + JUSTIFICATION (1.00 pt Teacher) ---\n";
+        bodyText += "a) " + checkItem("q5_a_mc", ["B"], "B", 0.25) + "\n";
+        bodyText += checkJustification("q5_a_just", "Saxon genitive ('s) shows possession for singular nouns ('uncle's garden').", 0.50) + "\n";
+        bodyText += "b) " + checkItem("q5_b_mc", ["C"], "C", 0.25) + "\n";
+        bodyText += checkJustification("q5_b_just", "3rd person singular takes 'wants' + 'to + infinitive' ('wants to build').", 0.50) + "\n\n";
+
+        bodyText += "--- SECTION 6: PUT THE WORDS IN ORDER (2.00 pts Auto - 0.50 each) ---\n";
+        bodyText += "a) " + checkItem("q6_a", ["My father's name is Martín.", "My father's name is Martín", "My father's name is Martin.", "My father's name is Martin"], "My father's name is Martín.", 0.50) + "\n";
+        bodyText += "b) " + checkItem("q6_b", ["Is your birthday in August?", "Is your birthday in August"], "Is your birthday in August?", 0.50) + "\n";
+        bodyText += "c) " + checkItem("q6_c", ["She wants a new tablet.", "She wants a new tablet"], "She wants a new tablet.", 0.50) + "\n";
+        bodyText += "d) " + checkItem("q6_d", ["We want to swim in the sea.", "We want to swim in the sea"], "We want to swim in the sea.", 0.50) + "\n";
+
+        var header = "====================================================================\n";
+        header += "EVALUACIÓN DE INGLÉS - 1° AÑO - 3° BIMESTRE (MODELO B - CABA)\n";
+        header += "====================================================================\n";
+        header += "Alumno/a: " + studentName + "\n";
+        header += "Curso: " + studentCourse + "\n";
+        header += "Fecha: " + new Date().toLocaleDateString() + "\n";
+        header += "Tiempo utilizado: " + timeUsed + " (de 30 min)\n";
+        header += "Alertas de Seguridad: " + securityLogs.length + "\n";
+        if (securityLogs.length > 0) {
+            header += "Detalle de Alertas:\n  - " + securityLogs.join("\n  - ") + "\n";
+        }
+        header += "--------------------------------------------------------------------\n";
+        header += "RESUMEN DE CALIFICACIÓN:\n";
+        header += "  * Puntaje Automático (Ítems objetivos): " + autoScore.toFixed(2) + " / 7.00 pts\n";
+        header += "  * Puntaje Elaboración (6 Justificaciones): _____ / 3.00 pts (A completar por el docente)\n";
+        header += "  * NOTA FINAL: _____ / 10.00 pts\n";
+        header += "====================================================================\n\n";
+
+        var footer = "\n====================================================================\n";
+        footer += "SUGERENCIA DE CÁLCULO DE PUNTAJE POR SECCIÓN (ESCALA 1 A 10)\n";
+        footer += "====================================================================\n";
+        footer += "- Section 2 (True/False): 4 elecciones x 0.25 = 1.00 pt + 4 justificaciones x 0.50 = 2.00 pts (Total: 3.00 pts)\n";
+        footer += "- Section 3 (Vocabulary): 5 ítems x 0.20 = 1.00 pt\n";
+        footer += "- Section 4 (Grammar Gaps): (1) 0.40 + (2) 0.35+0.35 + (3) 0.50 + (4) 0.40 + (5) 0.50 = 2.50 pts\n";
+        footer += "- Section 5 (Multiple Choice): 2 elecciones x 0.25 = 0.50 pt + 2 justificaciones x 0.50 = 1.00 pt (Total: 1.50 pts)\n";
+        footer += "- Section 6 (Word Order): 4 oraciones x 0.50 = 2.00 pts\n";
+
+        var blob = new Blob([header + bodyText + footer], { type: "text/plain;charset=utf-8" });
+        var link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = "3Bim_ModB_" + studentCourse.replace(/\s+/g, "") + "_" + studentName.replace(/\s+/g, "_") + ".txt";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+        document.getElementById("btn-start").addEventListener("click", startExam);
+        document.getElementById("btn-return").addEventListener("click", returnFullscreen);
+        document.getElementById("btn-finish").addEventListener("click", finishExam);
+        document.getElementById("btn-redownload").addEventListener("click", downloadResults);
+
+        document.addEventListener("contextmenu", function(e) { e.preventDefault(); });
+        document.addEventListener("keydown", function(e) {
+            var k = e.key ? e.key.toLowerCase() : "";
+            if ((e.ctrlKey && ["c","v","x","u","s","p","a"].indexOf(k) !== -1) || e.key === "F12") {
+                e.preventDefault();
+                if (examStarted && !examFinished) logSecurity("Tecla bloqueada presionada: " + e.key);
+            }
+        });
+        document.addEventListener("fullscreenchange", function() {
+            if (examStarted && !examFinished && !document.fullscreenElement) {
+                logSecurity("Salió de Pantalla Completa");
+                document.getElementById("warning-modal").style.display = "flex";
+            }
+        });
+        document.addEventListener("visibilitychange", function() {
+            if (examStarted && !examFinished && document.hidden) {
+                logSecurity("Cambió de pestaña o minimizó el navegador");
+                document.getElementById("warning-modal").style.display = "flex";
+            }
+        });
+    });
+</script>
+</body>
+</html>
